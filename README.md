@@ -63,6 +63,11 @@ of the first testcase is given below:
 
 ````
 $ lein run 1 ../path/to/sc1.xmi
+Testing ttc-2013-pn2sc-validation.main
+
+Ran 1 tests containing 22 assertions.
+0 failures, 0 errors.
+The model passes the validator. :-)
 ````
 
 ## License
