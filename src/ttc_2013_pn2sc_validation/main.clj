@@ -31,7 +31,8 @@
                     1 test-case-1-result-spec
                     2 test-case-2-result-spec
                     3 test-case-3-result-spec)))
-      (validate-model))
+      (if (successful? (run-tests 'ttc-2013-pn2sc-validation.main))
+        (println "The model passes the validator. :-)")))
     (catch Exception err
       (print-usage err))))
 

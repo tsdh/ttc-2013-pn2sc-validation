@@ -1,5 +1,6 @@
 (ns ttc-2013-pn2sc-validation.core
   (:use clojure.test
+        clojure.walk
         funnyqt.emf
         funnyqt.protocols
         funnyqt.query))
@@ -201,11 +202,6 @@
                  (eallobjects sc 'HyperEdge))))
 
 (defn validate-hyperedges [sc he-spec]
-  (let [cc (count he-spec)
-        rc (count (eallobjects sc 'HyperEdge))]
-    (is (= cc rc)
-        (format "ERROR: There should be %s HyperEdges, but you have %s."
-                cc rc)))
   (doseq [[hen [rnexts nexts]] he-spec]
     (if-let [he (hyperedge sc hen)]
       (do
@@ -215,23 +211,52 @@
         (is (= nexts (next-names he))
             (format "ERROR: The HyperEdge \"%s\" should have :next %s but has %s."
                     hen nexts (next-names he))))
-      (is false (format "ERROR: There's no HyperEdge with name \"%s\"." hen)))))
+      (let [aHyperEdge 'aHyperEdge]
+        (is (= aHyperEdge nil)
+            (format "ERROR: There's no HyperEdge with name \"%s\"." hen))))))
+
+(defn contained-hyperedges? [sc]
+  (let [r (exists? #(eget % :rcontains) (eallobjects sc 'HyperEdge))]
+    (when-not r
+      (println "WARNING: Your HyperEdges aren't contained by some Compound state.")
+      (println "As an extension, they should be contained by the nearest upper")
+      (println "Compound state that contains all rnext/next States of the Hyperedge.")
+      (println "=> The HyperEdges will be ignored in the containment check."))
+    r))
+
+(defn toplevel-hyperedges [form]
+  (let [hes (atom [])]
+    (into (clojure.walk/postwalk
+           (fn [x]
+             (if (and (vector? x) (vector? (first x)))
+               (vec (remove (fn [e]
+                              (if (= :HyperEdge (first e))
+                                (swap! hes conj e)
+                                false))
+                            x))
+               x))
+           form)
+          @hes)))
+
 
 (defn validate [sc [unique-top counts containment-spec hyperedge-spec]]
   (when unique-top
     (let [no-scs (count (eallobjects sc 'Statechart))
           no-tops (count (filter #(not (eget % :rcontains)) (eallobjects sc 'AND)))]
-      (is (= no-scs 1)
-          (format "ERROR: There's not one unique Statechart (#Statechart = %s)." no-scs))
-      (is (= no-tops 1)
-          (format "ERROR: There's not one unique AND-topState (#topANDStates = %s)." no-tops))))
-  (validate-counts sc counts)
-  (is (validate-containment nil (top-states sc) containment-spec)
-      "ERROR: Something's wrong with the containment hierarchy!")
-  (validate-hyperedges sc hyperedge-spec))
-
-;;(def sc1 (load-model "../ttc-2013-pn2sc/sc1.xmi"))
-;;(validate sc1 test-case-1-result-spec)
-
-
+      (testing "Testing the uniqueness of Statechart and AND-topState"
+        (is (= no-scs 1)
+            (format "ERROR: There's not one unique Statechart (#Statechart = %s)." no-scs))
+        (is (= no-tops 1)
+            (format "ERROR: There's not one unique AND-topState (#topANDStates = %s)." no-tops)))))
+  (testing "Testing the instance counts of all metaclasses"
+    (validate-counts sc counts))
+  (testing "Testing the containment hierarchy"
+    (let [contained-hes (contained-hyperedges? sc)]
+      (is (validate-containment nil (top-states sc)
+                                (if contained-hes
+                                  containment-spec
+                                  (toplevel-hyperedges containment-spec)))
+          "ERROR: Something's wrong with the containment hierarchy!")))
+  (testing "Testing the rnext/next references of HyperEdges"
+    (validate-hyperedges sc hyperedge-spec)))
 

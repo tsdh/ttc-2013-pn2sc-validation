@@ -27,15 +27,42 @@ and place it somewhere in your `PATH`.
   - Linux/Mac: [lein](https://raw.github.com/technomancy/leiningen/stable/bin/lein)
   - Windows: [lein.bat](https://raw.github.com/technomancy/leiningen/preview/bin/lein.bat)
 
-Leiningen is a configuration and build management tool based on Maven.
+Leiningen is a configuration and build management tool based on
+[Maven](http://maven.apache.org/).
 
 ## Usage
 
-First, clone this project:
+First, clone this project and change into its directory:
 
 ````
-cd ttc-stuff/
-git clone 
+$ cd ttc-stuff/
+$ git clone git://github.com/tsdh/ttc-2013-pn2sc-validation.git
+$ cd ttc-2013-pn2sc-validation/
+````
+
+Afterwards, you can use `lein run` to run the validator.  The first invocation
+will fetch all required dependencies for you.  This may seem as if it was
+downloading the whole internet (it'll also download Maven and everything
+required by it), so be patient.
+
+`lein run` without arguments will print the synopsis of the command:
+
+````
+$ lein run
+You are using me wrongly!
+
+Usage: lein run <testcase> <statechart-xmi>
+  - <testcase> may be 1, 2, or 3
+  - <statechart-xmi> is an EMF XMI file containing the target statechart
+````
+
+So you should call it with a number and a statechart model XMI file.  The
+number tells the validator to what testcase the provided model corresponds.  An
+invocation for testing a model `sc1.xmi` if it conforms to the expected outcome
+of the first testcase is given below:
+
+````
+$ lein run 1 ../path/to/sc1.xmi
 ````
 
 ## License
