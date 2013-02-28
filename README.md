@@ -19,6 +19,15 @@ The following things are checked:
     `HyperEdge` are checked against their actual contents.  Hereby, the order
     is ignored.
 
+The validator requires one assumption about the statechart models: every
+`Basic` state and every `HyperEdge` has to be named according to the `Place` or
+`Transition` it has been created for by the initialization transformation as
+stated in section 2.2 of the case description.  The names of the `OR` and `AND`
+may be chosen arbitrary.  As a consequence, the provided result models in
+[Louis example solution project](https://github.com/louismrose/ttc_pn2sc/) are
+not valid according to this validator, because his transformation doesn't
+preserve the names.
+
 ## Prerequisites
 
 You need to install the `lein` script from [Leiningen](http://leiningen.org)
