@@ -4,7 +4,8 @@
         [ttc-2013-pn2sc-validation.core :only [validate
                                                test-case-1-result-spec
                                                test-case-2-result-spec
-                                               test-case-3-result-spec]]))
+                                               test-case-3-result-spec
+                                               performance-test-cases]]))
 
 (defn print-usage [err]
   (binding [*out* *err*]
@@ -18,7 +19,7 @@
     (println "    4000, 5000, 10000, 20000, 40000, 80000, 100000, or 200000,")
     (println "    denoting one of the performance testcases.  For the performance")
     (println "    testcases, only the number of elements are checked.")
-    (println "  - <statechart-xmi> is an EMF XMI file containing the target statechart")
+    (println "  - <statechart-xmi> is an EMF XMI file containing the target statechart.")
     (System/exit 1)))
 
 (defn -main [& args]
@@ -27,8 +28,6 @@
   (try
     (let [tc-no (Integer/parseInt (first args))
           model (load-model (second args))]
-      (when (or (< tc-no 1) (> tc-no 3))
-        (print-usage nil))
       (deftest validate-model
         (validate model
                   (case tc-no
@@ -37,7 +36,8 @@
                     3 test-case-3-result-spec
                     (200 300 400 500 1000 2000 3000 4000 5000
                          10000 20000 40000 80000
-                         100000 200000) (performance-test-cases tc-no))))
+                         100000 200000) (performance-test-cases tc-no)
+                    (print-usage nil))))
       (if (successful? (run-tests 'ttc-2013-pn2sc-validation.main))
         (println "The model passes the validator. :-)")))
     (catch Exception err
