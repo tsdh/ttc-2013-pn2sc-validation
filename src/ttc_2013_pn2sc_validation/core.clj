@@ -160,6 +160,22 @@
     "dermatologist calls in patient" [#{"biopsy ordered" "waiting for dermatologist"}
                                       #{"dermatologist session"}]}])
 
+(def performance-test-cases
+  {200    [false {:Basic 163,   :HyperEdge 126,   :OR 65,    :AND 6}]
+   300    [false {:Basic 244,   :HyperEdge 189,   :OR 97,    :AND 9}]
+   400    [false {:Basic 325,   :HyperEdge 252,   :OR 129,   :AND 12}]
+   500    [false {:Basic 406,   :HyperEdge 315,   :OR 161,   :AND 15}]
+   1000   [false {:Basic 811,   :HyperEdge 630,   :OR 321,   :AND 30}]
+   2000   [false {:Basic 1620,  :HyperEdge 1259,  :OR 641,   :AND 60}]
+   3000   [false {:Basic 2429,  :HyperEdge 1888,  :OR 961,   :AND 90}]
+   4000   [false {:Basic 3238,  :HyperEdge 2517,  :OR 1281,  :AND 120}]
+   5000   [false {:Basic 4047,  :HyperEdge 3146,  :OR 1601,  :AND 150}]
+   10000  [false {:Basic 8092,  :HyperEdge 6291,  :OR 3201,  :AND 300}]
+   20000  [false {:Basic 16183, :HyperEdge 12582, :OR 6401,  :AND 600}]
+   40000  [false {:Basic 32365, :HyperEdge 25164, :OR 17791, :AND 800}]
+   80000  [false {:Basic 64729, :HyperEdge 50328, :OR 45363, :AND 1000}]
+   100000 [false {:Basic 80911, :HyperEdge 62910, :OR 51763, :AND 1600}]
+   200000 [false {:Basic 1620,  :HyperEdge 1259,  :OR 641,   :AND 60}]})
 
 ;;* The validation code
 
@@ -250,13 +266,15 @@
             (format "ERROR: There's not one unique AND-topState (#topANDStates = %s)." no-tops)))))
   (testing "Testing the instance counts of all metaclasses"
     (validate-counts sc counts))
-  (testing "Testing the containment hierarchy"
-    (let [contained-hes (contained-hyperedges? sc)]
-      (is (validate-containment nil (top-states sc)
-                                (if contained-hes
-                                  containment-spec
-                                  (toplevel-hyperedges containment-spec)))
-          "ERROR: Something's wrong with the containment hierarchy!")))
-  (testing "Testing the rnext/next references of HyperEdges"
-    (validate-hyperedges sc hyperedge-spec)))
+  (when containment-spec
+    (testing "Testing the containment hierarchy"
+      (let [contained-hes (contained-hyperedges? sc)]
+        (is (validate-containment nil (top-states sc)
+                                  (if contained-hes
+                                    containment-spec
+                                    (toplevel-hyperedges containment-spec)))
+            "ERROR: Something's wrong with the containment hierarchy!"))))
+  (when hyperedge-spec
+    (testing "Testing the rnext/next references of HyperEdges"
+      (validate-hyperedges sc hyperedge-spec))))
 

@@ -30,8 +30,10 @@ preserve the names.
 
 ## Prerequisites
 
-You need to install the `lein` script from [Leiningen](http://leiningen.org)
-and place it somewhere in your `PATH`.
+First of all, you need a JDK version 7.
+
+Also, you need to install the `lein` script from
+[Leiningen](http://leiningen.org) and place it somewhere in your `PATH`.
 
   - Linux/Mac: [lein](https://raw.github.com/technomancy/leiningen/stable/bin/lein)
   - Windows: [lein.bat](https://raw.github.com/technomancy/leiningen/preview/bin/lein.bat)

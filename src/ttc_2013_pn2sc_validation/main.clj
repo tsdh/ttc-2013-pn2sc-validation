@@ -13,7 +13,11 @@
       (println "You are using me wrongly!"))
     (println)
     (println "Usage: lein run <testcase> <statechart-xmi>")
-    (println "  - <testcase> may be 1, 2, or 3")
+    (println "  - <testcase> may be 1, 2, or 3 for the 3 main testcases.")
+    (println "    It may also be one of 200, 300, 400, 500, 1000, 2000, 3000,")
+    (println "    4000, 5000, 10000, 20000, 40000, 80000, 100000, or 200000,")
+    (println "    denoting one of the performance testcases.  For the performance")
+    (println "    testcases, only the number of elements are checked.")
     (println "  - <statechart-xmi> is an EMF XMI file containing the target statechart")
     (System/exit 1)))
 
@@ -30,7 +34,10 @@
                   (case tc-no
                     1 test-case-1-result-spec
                     2 test-case-2-result-spec
-                    3 test-case-3-result-spec)))
+                    3 test-case-3-result-spec
+                    (200 300 400 500 1000 2000 3000 4000 5000
+                         10000 20000 40000 80000
+                         100000 200000) (performance-test-cases tc-no))))
       (if (successful? (run-tests 'ttc-2013-pn2sc-validation.main))
         (println "The model passes the validator. :-)")))
     (catch Exception err
