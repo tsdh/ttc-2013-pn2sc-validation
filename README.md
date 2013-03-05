@@ -1,23 +1,32 @@
 # A Validator for the TTC 2013 PetriNet-to-Statechart Case
 
 This is a simple validator that checks the result Statchart models of the TTC
-2013 PetriNet-to-Statechart Case.  It works only with the test cases 1 to 3.
+2013 PetriNet-to-Statechart Case.  It works with the main testcases 1 to 11,
+and it also does some checks for the performance test cases.
 
-The following things are checked:
+The following things are checked for the main testcases:
 
-  - For the test cases 1 and 2, there has to be exactly one `Statechart`
-    element containing exactly one `AND` state containing the top-most `OR`
-    state created by the reduction rules.
+  - For the test cases where a complete reduction is feasible, there has to be
+	exactly one `Statechart` element containing exactly one `AND` state
+	containing the top-most `OR` state created by the reduction rules.
+
+	This check is also performed for the performance test cases.
 
   - For every element type, the expected number of instances is checked against
-    the actual number of instances.
+	the actual number of instances.
+
+	This check is also performed for the performance test cases.
 
   - The expected containment hierarchy is checked against the actual
-    containment hierarchy.
-	
+	containment hierarchy.
+
+	This check is not performed for the performance test cases.
+
   - The expected contents of the `rnext` and `next` references of each
-    `HyperEdge` are checked against their actual contents.  Hereby, the order
-    is ignored.
+	`HyperEdge` are checked against their actual contents.  Hereby, the order
+	is ignored.
+
+	This check is not performed for the performance test cases.
 
 The validator requires one assumption about the statechart models: every
 `Basic` state and every `HyperEdge` has to be named according to the `Place` or
@@ -63,8 +72,12 @@ $ lein run
 You are using me wrongly!
 
 Usage: lein run <testcase> <statechart-xmi>
-  - <testcase> may be 1, 2, or 3
-  - <statechart-xmi> is an EMF XMI file containing the target statechart
+  - <testcase> may be 1 to 11 for one of the 11 main testcases.
+	It may also be one of 200, 300, 400, 500, 1000, 2000, 3000,
+	4000, 5000, 10000, 20000, 40000, 80000, 100000, or 200000,
+	denoting one of the performance testcases.  For the performance
+	testcases, only the number of elements are checked.
+  - <statechart-xmi> is an EMF XMI file containing the target statechart.
 ````
 
 So you should call it with a number and a statechart model XMI file.  The
@@ -73,10 +86,10 @@ invocation for testing a model `sc1.xmi` if it conforms to the expected outcome
 of the first testcase is given below:
 
 ````
-$ lein run 1 ../path/to/sc1.xmi
+$ lein run 1 ../path/to/testcase1result.statechart
 Testing ttc-2013-pn2sc-validation.main
 
-Ran 1 tests containing 22 assertions.
+Ran 1 tests containing 23 assertions.
 0 failures, 0 errors.
 The model passes the validator. :-)
 ````

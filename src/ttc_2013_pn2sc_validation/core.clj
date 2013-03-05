@@ -1,4 +1,6 @@
 (ns ttc-2013-pn2sc-validation.core
+  (:require [clojure.data :as d]
+            clojure.pprint)
   (:use clojure.test
         clojure.walk
         funnyqt.emf
@@ -292,6 +294,21 @@
 
 ;;* The validation code
 
+(declare make-content-spec)
+(defn spec-for [o]
+  (type-cond o
+    'Statechart (first (make-content-spec (econtents o) #{}))
+    'Basic     [:Basic (eget o :name)]
+    'HyperEdge [:HyperEdge (eget o :name)]
+    'OR        [:OR (make-content-spec (econtents o) #{})]
+    'AND       [:AND (make-content-spec (econtents o) #{})]))
+
+(defn make-content-spec [tops v]
+  (into v (map spec-for tops)))
+
+(defn tops [sc]
+  (remove #(econtainer %) (eallobjects sc)))
+
 (defn validate-counts [sc counts]
   (doseq [[tkw num] counts
           :let [t (symbol (name tkw))
@@ -300,26 +317,15 @@
         (format "ERROR: There should be %s %s-elements, but there are %s."
                 num t c))))
 
-(defn top-states [sc]
-  (filter #(not (eget % :rcontains)) (eallobjects sc 'State)))
-
-(declare validate-containment)  ;; Forward declaration
-
-(defn matches [node [type x]]
-  (type-cond node
-    'Basic (and (= type :Basic)
-                (= x (eget node :name)))
-    'HyperEdge (and (= type :HyperEdge)
-                    (= x (eget node :name)))
-    'AND (and (= type :AND)
-              (validate-containment node (eget node :contains) x))
-    'OR (and (= type :OR)
-             (validate-containment node (eget node :contains) x))))
-
-(defn validate-containment [parent content-nodes content-specs]
-  (forall? (fn [t]
-             (exists1? #(matches t %) content-specs))
-           content-nodes))
+(defn validate-containment [sc expected-content-spec]
+  (let [actual-content-spec (make-content-spec (tops sc) #{})
+        [exp act both :as diff] (d/diff expected-content-spec actual-content-spec)]
+    (is (and (empty? exp) (empty? act))
+        (with-out-str
+          (println "Expected containment hierarchy was:")
+          (clojure.pprint/pprint exp)
+          (println "But actual containment hierarchy was:")
+          (clojure.pprint/pprint act)))))
 
 (defn x-names [x state]
   (set (map #(eget % :name) (eget state x))))
@@ -354,11 +360,11 @@
     r))
 
 (defn toplevel-hyperedges [form]
-  (let [hes (atom [])]
+  (let [hes (atom #{})]
     (into (clojure.walk/postwalk
            (fn [x]
-             (if (and (vector? x) (vector? (first x)))
-               (vec (remove (fn [e]
+             (if (set? x) #_(and (vector? x) (vector? (first x)))
+               (set (remove (fn [e]
                               (if (= :HyperEdge (first e))
                                 (swap! hes conj e)
                                 false))
@@ -382,11 +388,9 @@
   (when containment-spec
     (testing "Testing the containment hierarchy"
       (let [contained-hes (contained-hyperedges? sc)]
-        (is (validate-containment nil (top-states sc)
-                                  (if contained-hes
-                                    containment-spec
-                                    (toplevel-hyperedges containment-spec)))
-            "ERROR: Something's wrong with the containment hierarchy!"))))
+        (validate-containment sc (if contained-hes
+                                   containment-spec
+                                   (toplevel-hyperedges containment-spec))))))
   (when hyperedge-spec
     (testing "Testing the rnext/next references of HyperEdges"
       (validate-hyperedges sc hyperedge-spec))))
