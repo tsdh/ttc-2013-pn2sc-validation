@@ -7,158 +7,271 @@
 
 ;;* Load the metamodel
 
-;;(load-metamodel "metamodel/PetriNets.ecore")
 (load-metamodel "metamodel/StateCharts.ecore")
 
 ;;* The validation specs
 
 (def test-case-1-result-spec
-  [;; there's a unique topAND with containing Statechart
+  [;; Does it resolve to a Statechart with unique top-AND-State?
    true
-   ;; Element counts
+   ;; Expected element counts
    {:HyperEdge 7, :AND 4, :Statechart 1, :OR 7, :Basic 11}
-   ;; The containment structure below the Statechart as a map of maps
-   [[:AND
-     [[:OR
-       [[:AND
-         [[:OR
-           [[:Basic "E10"]]]
-          [:OR
-           [[:HyperEdge "E12"]
-            [:AND
-             [[:OR
-               [[:Basic "E2"]
-                [:HyperEdge "E13"]
-                [:Basic "E3"]
-                [:HyperEdge "E14"]
-                [:Basic "E4"]]]
-              [:OR
-               [[:AND
-                 [[:OR
-                   [[:Basic "E5"]]]
-                  [:OR
-                   [[:Basic "E7"]
-                    [:HyperEdge "E16"]
-                    [:Basic "E8"]]]]]
-                [:Basic "E6"]
-                [:HyperEdge "E15"]]]]]
-            [:Basic "E0"]
-            [:HyperEdge "E11"]
-            [:Basic "E1"]]]]]
-        [:HyperEdge "E17"]
-        [:Basic "E9"]]]]]]
-   ;; The HyperEdge connections as a map:
-   ;; HyperEdge -> [rnext-set next-set]
-   {"E11" [#{"E1"}      #{"E0"}]
-    "E12" [#{"E2" "E6"} #{"E1"}]
-    "E13" [#{"E3"}      #{"E2"}]
-    "E14" [#{"E4"}      #{"E3"}]
-    "E15" [#{"E5" "E7"} #{"E6"}]
-    "E16" [#{"E8"}      #{"E7"}]
-    "E17" [#{"E9"}      #{"E10" "E4" "E5" "E8"}]}])
+   ;; Expected containment hierarchy
+   #{[:AND
+      #{[:OR
+         #{[:HyperEdge "E17"] [:Basic "E9"]
+           [:AND
+            #{[:OR
+               #{[:Basic "E0"] [:Basic "E1"] [:HyperEdge "E11"]
+                 [:HyperEdge "E12"]
+                 [:AND
+                  #{[:OR
+                     #{[:AND
+                        #{[:OR
+                           #{[:Basic "E7"] [:HyperEdge "E16"]
+                             [:Basic "E8"]}]
+                          [:OR #{[:Basic "E5"]}]}]
+                       [:Basic "E6"] [:HyperEdge "E15"]}]
+                    [:OR
+                     #{[:Basic "E2"] [:Basic "E3"] [:Basic "E4"]
+                       [:HyperEdge "E13"] [:HyperEdge "E14"]}]}]}]
+              [:OR #{[:Basic "E10"]}]}]}]}]}
+   ;; Expected HyperEdge rnext/next linkage
+   {"E11" [#{"E1"} #{"E0"}],
+    "E12" [#{"E2" "E6"} #{"E1"}],
+    "E13" [#{"E3"} #{"E2"}],
+    "E14" [#{"E4"} #{"E3"}],
+    "E15" [#{"E5" "E7"} #{"E6"}],
+    "E16" [#{"E8"} #{"E7"}],
+    "E17" [#{"E9"} #{"E10" "E4" "E5" "E8"}]}])
 
 (def test-case-2-result-spec
-  [;; there's a unique topAND with containing Statechart
-   true
-   ;; Element counts
+  [true
    {:HyperEdge 10, :AND 3, :Statechart 1, :OR 5, :Basic 12}
-   ;; The containment structure below the Statechart as a map of maps
-   [[:AND
-     [[:OR
-       [[:HyperEdge "n54"]
-        [:HyperEdge "n53"]
-        [:HyperEdge "n55"]
-        [:Basic "assessed"]
-        [:HyperEdge "n4D"]
-        [:Basic "settled"]
-        [:HyperEdge "n4E"]
-        [:Basic "rejected"]
-        [:HyperEdge "n4F"]
-        [:Basic "archived"]
-        [:HyperEdge "n4C"]
-        [:Basic "E1"]
-        [:Basic "E2"]
-        [:AND
-         [[:OR
-           [[:Basic "received"]]]
-          [:OR
-           [[:HyperEdge "E3"]
-            [:Basic "E0"]
-            [:AND
-             [[:OR
-               [[:Basic "policy checked"]
-                [:HyperEdge "n51"]
-                [:Basic "pollicy unchecked"]]]
-              [:OR
-               [[:Basic "damage checked"]
-                [:HyperEdge "n52"]
-                [:Basic "damage unchecked"]]]]]]]]]]]]]]
-   ;; The HyperEdge connections as a map:
-   ;; HyperEdge -> [rnext-set next-set]
-   {"n54" [#{"E2"} #{"pollicy unchecked" "received" "damage unchecked"}]
-    "n51" [#{"pollicy unchecked"} #{"policy checked"}]
-    "n52" [#{"damage unchecked"} #{"damage checked"}]
-    "E3"  [#{"policy checked" "damage checked"} #{"E0"}]
-    "n55" [#{"received" "E0"} #{"rejected"}]
-    "n53" [#{"received" "E0"} #{"assessed"}]
-    "n4F" [#{"rejected"} #{"E1"}]
-    "n4D" [#{"assessed"} #{"settled"}]
-    "n4C" [#{"E1"} #{"archived"}]
+   #{[:AND
+      #{[:OR
+         #{[:Basic "E1"] [:Basic "E2"] [:HyperEdge "n53"]
+           [:HyperEdge "n54"] [:HyperEdge "n55"]
+           [:AND
+            #{[:OR
+               #{[:Basic "E0"]
+                 [:AND
+                  #{[:OR
+                     #{[:Basic "pollicy unchecked"] [:HyperEdge "n51"]
+                       [:Basic "policy checked"]}]
+                    [:OR
+                     #{[:HyperEdge "n52"] [:Basic "damage checked"]
+                       [:Basic "damage unchecked"]}]}]
+                 [:HyperEdge "E3"]}]
+              [:OR #{[:Basic "received"]}]}]
+           [:Basic "settled"] [:Basic "rejected"] [:Basic "archived"]
+           [:Basic "assessed"] [:HyperEdge "n4C"] [:HyperEdge "n4D"]
+           [:HyperEdge "n4E"] [:HyperEdge "n4F"]}]}]}
+   {"n4F" [#{"rejected"} #{"E1"}],
+    "n51" [#{"pollicy unchecked"} #{"policy checked"}],
+    "n52" [#{"damage unchecked"} #{"damage checked"}],
+    "n53" [#{"received" "E0"} #{"assessed"}],
+    "n54" [#{"E2"} #{"received" "pollicy unchecked" "damage unchecked"}],
+    "E3"  [#{"damage checked" "policy checked"} #{"E0"}],
+    "n55" [#{"received" "E0"} #{"rejected"}],
+    "n4C" [#{"E1"} #{"archived"}],
+    "n4D" [#{"assessed"} #{"settled"}],
     "n4E" [#{"settled"} #{"E1"}]}])
 
 (def test-case-3-result-spec
-  [;; This one has no unique top AND state
-   false
-   ;; Element counts
+  [false
    {:HyperEdge 10, :AND 0, :Statechart 0, :OR 6, :Basic 10}
-   ;; Therefore we have multiple top-level elements
-   [[:OR
-     [[:Basic "patient arrived"]
-      [:HyperEdge "eID signin"]
-      [:HyperEdge "secretary signin"]
-      [:Basic "patient registered in HIS"]]]
-    [:HyperEdge "needs pics, cannot walk"]
-    [:HyperEdge "needs pics, can walk"]
-    [:HyperEdge "patient has high quality pics already"]
-    [:OR
-     [[:Basic "patient walking to dermatology"]
-      [:HyperEdge "patient is sent to photographer"]
-      [:Basic "take pictures"]
-      [:HyperEdge "begin photography session"]
-      [:HyperEdge "end photography session"]
-      [:Basic "waiting for photographer"]
-      [:Basic "waiting for dermatologist"]]]
-    [:OR
-     [[:Basic "photographs ordered"]]]
-    [:HyperEdge "nurse picks up patient"]
-    [:OR
-     [[:Basic "biopsy ordered"]]]
-    [:HyperEdge "dermatologist calls in patient"]
-    [:OR
-     [[:Basic "patient in hall"]]]
-    [:OR
-     [[:Basic "dermatologist session"]]]]
-   ;; The HyperEdge connections as a map:
-   ;; HyperEdge -> [rnext-set next-set]
-   {"eID signin" [#{"patient arrived"} #{"patient registered in HIS"}]
-    "secretary signin" [#{"patient arrived"} #{"patient registered in HIS"}]
-    "patient has high quality pics already" [#{"patient registered in HIS"}
-                                             #{"biopsy ordered" "waiting for dermatologist"}]
+   #{[:OR
+      #{[:Basic "take pictures"]
+        [:Basic "patient walking to dermatology"]
+        [:Basic "waiting for photographer"]
+        [:HyperEdge "end photography session"]
+        [:Basic "waiting for dermatologist"]
+        [:HyperEdge "begin photography session"]
+        [:HyperEdge "patient is sent to photographer"]}]
+     [:HyperEdge "needs pics, cannot walk"]
+     [:OR #{[:Basic "patient in hall"]}]
+     [:OR #{[:Basic "biopsy ordered"]}]
+     [:OR #{[:Basic "dermatologist session"]}]
+     [:HyperEdge "dermatologist calls in patient"]
+     [:HyperEdge "nurse picks up patient"]
+     [:OR #{[:Basic "photographs ordered"]}]
+     [:OR
+      #{[:HyperEdge "eID signin"] [:HyperEdge "secretary signin"]
+        [:Basic "patient arrived"] [:Basic "patient registered in HIS"]}]
+     [:HyperEdge "needs pics, can walk"]
+     [:HyperEdge "patient has high quality pics already"]}
+   {"patient is sent to photographer"  [#{"patient walking to dermatology"}
+                                        #{"waiting for photographer"}],
+    "eID signin" [#{"patient arrived"} #{"patient registered in HIS"}],
     "needs pics, cannot walk" [#{"patient registered in HIS"}
-                               #{"biopsy ordered" "photographs ordered" "patient in hall"}]
-    "needs pics, can walk" [#{"patient registered in HIS"}
-                            #{"biopsy ordered" "patient walking to dermatology"
-                              "photographs ordered"}]
-    "patient is sent to photographer" [#{"patient walking to dermatology"}
-                                       #{"waiting for photographer"}]
-    "nurse picks up patient" [#{"photographs ordered" "patient in hall"}
-                              #{"waiting for photographer"}]
-    "begin photography session" [#{"waiting for photographer"}
-                                 #{"take pictures"}]
+                               #{"photographs ordered" "patient in hall"
+                                 "biopsy ordered"}],
+    "secretary signin" [#{"patient arrived"}
+                        #{"patient registered in HIS"}],
     "end photography session" [#{"take pictures"}
-                               #{"waiting for dermatologist"}]
-    "dermatologist calls in patient" [#{"biopsy ordered" "waiting for dermatologist"}
-                                      #{"dermatologist session"}]}])
+                               #{"waiting for dermatologist"}],
+    "dermatologist calls in patient" [#{"biopsy ordered"
+                                        "waiting for dermatologist"}
+                                      #{"dermatologist session"}],
+    "nurse picks up patient" [#{"photographs ordered" "patient in hall"}
+                              #{"waiting for photographer"}],
+    "needs pics, can walk" [#{"patient registered in HIS"}
+                            #{"photographs ordered"
+                              "patient walking to dermatology"
+                              "biopsy ordered"}],
+    "begin photography session" [#{"waiting for photographer"}
+                                 #{"take pictures"}],
+    "patient has high quality pics already" [#{"patient registered in HIS"}
+                                             #{"biopsy ordered"
+                                               "waiting for dermatologist"}]}])
+
+(def test-case-4-result-spec
+  [false
+   {:HyperEdge 8, :AND 1, :Statechart 0, :OR 5, :Basic 10}
+   #{[:OR
+      #{[:AND
+         #{[:OR #{[:Basic "p2"] [:Basic "p5"] [:HyperEdge "t5"]}]
+           [:OR #{[:HyperEdge "t6"] [:Basic "p3"] [:Basic "p6"]}]}]}]
+     [:OR #{[:Basic "p1"]}]
+     [:OR
+      #{[:HyperEdge "t7"] [:HyperEdge "t8"] [:Basic "p10"] [:Basic "p4"]
+        [:Basic "p7"] [:HyperEdge "t3"] [:Basic "p8"] [:HyperEdge "t4"]
+        [:Basic "p9"]}]
+     [:HyperEdge "t1"] [:HyperEdge "t2"]}
+   {"t4" [#{"p9"} #{"p10"}],
+    "t5" [#{"p2"} #{"p5"}],
+    "t6" [#{"p3"} #{"p6"}],
+    "t7" [#{"p4"} #{"p7"}],
+    "t8" [#{"p7"} #{"p9"}],
+    "t1" [#{"p1"} #{"p2" "p3" "p4"}],
+    "t2" [#{"p5" "p6"} #{"p8"}],
+    "t3" [#{"p8"} #{"p10"}]}])
+
+(def test-case-5-result-spec
+  [false
+   {:HyperEdge 3, :AND 0, :Statechart 0, :OR 2, :Basic 4}
+   #{[:OR #{[:Basic "p1"] [:Basic "p3"] [:HyperEdge "t2"]}]
+     [:OR #{[:Basic "p2"] [:Basic "p4"] [:HyperEdge "t3"]}]
+     [:HyperEdge "t1"]}
+   {"t1" [#{"p1"} #{"p2" "p3"}],
+    "t2" [#{"p3"} #{"p1"}],
+    "t3" [#{"p2"} #{"p4"}]}] )
+
+(def test-case-6-result-spec
+  [false
+   {:HyperEdge 2, :AND 1, :Statechart 0, :OR 4, :Basic 4}
+   #{[:OR #{[:Basic "p4"]}] [:HyperEdge "t1"]
+     [:OR
+      #{[:AND #{[:OR #{[:Basic "p2"]}] [:OR #{[:Basic "p3"]}]}]
+        [:Basic "p1"] [:HyperEdge "t2"]}]}
+   {"t1" [#{"p1"} #{"p2" "p3" "p4"}]
+    "t2" [#{"p2" "p3"} #{"p1"}]}])
+
+(def test-case-7-result-spec
+  [true
+   {:HyperEdge 7, :AND 3, :Statechart 1, :OR 5, :Basic 10}
+   #{[:AND
+      #{[:OR
+         #{[:HyperEdge "t7"] [:Basic "p10"] [:Basic "p1"]
+           [:AND
+            #{[:OR
+               #{[:HyperEdge "t6"] [:Basic "p4"] [:Basic "p7"]
+                 [:HyperEdge "t4"] [:Basic "p9"]}]
+              [:OR
+               #{[:AND
+                  #{[:OR
+                     #{[:Basic "p2"] [:Basic "p5"] [:HyperEdge "t2"]}]
+                    [:OR
+                     #{[:Basic "p3"] [:Basic "p6"] [:HyperEdge "t3"]}]}]
+                 [:Basic "p8"] [:HyperEdge "t5"]}]}]
+           [:HyperEdge "t1"]}]}]}
+   {"t4" [#{"p4"} #{"p7"}],
+    "t5" [#{"p5" "p6"} #{"p8"}],
+    "t6" [#{"p7"} #{"p9"}],
+    "t7" [#{"p8" "p9"} #{"p10"}],
+    "t1" [#{"p1"} #{"p2" "p3" "p4"}],
+    "t2" [#{"p2"} #{"p5"}],
+    "t3" [#{"p3"} #{"p6"}]}] )
+
+(def test-case-8-result-spec
+  [true
+   {:HyperEdge 8, :AND 4, :Statechart 1, :OR 7, :Basic 12}
+   #{[:AND
+      #{[:OR
+         #{[:Basic "p12"]
+           [:AND
+            #{[:OR
+               #{[:AND
+                  #{[:OR
+                     #{[:HyperEdge "t7"] [:Basic "p10"] [:Basic "p7"]}]
+                    [:OR
+                     #{[:HyperEdge "t8"] [:Basic "p11"] [:Basic "p8"]}]}]
+                 [:Basic "p4"] [:HyperEdge "t3"]}]
+              [:OR
+               #{[:AND
+                  #{[:OR
+                     #{[:Basic "p2"] [:Basic "p5"] [:HyperEdge "t5"]}]
+                    [:OR
+                     #{[:HyperEdge "t6"] [:Basic "p3"] [:Basic "p6"]}]}]
+                 [:HyperEdge "t2"] [:Basic "p9"]}]}]
+           [:Basic "p1"] [:HyperEdge "t1"] [:HyperEdge "t4"]}]}]}
+   {"t4" [#{"p9" "p10" "p11"} #{"p12"}],
+    "t5" [#{"p2"} #{"p5"}],
+    "t6" [#{"p3"} #{"p6"}],
+    "t7" [#{"p7"} #{"p10"}],
+    "t8" [#{"p8"} #{"p11"}],
+    "t1" [#{"p1"} #{"p2" "p3" "p4"}],
+    "t2" [#{"p5" "p6"} #{"p9"}],
+    "t3" [#{"p4"} #{"p7" "p8"}]}])
+
+(def test-case-9-result-spec
+  [false
+   {:HyperEdge 6, :AND 0, :Statechart 0, :OR 10, :Basic 10}
+   #{[:HyperEdge "t6"] [:OR #{[:Basic "p1"]}] [:OR #{[:Basic "p2"]}]
+     [:OR #{[:Basic "p3"]}] [:OR #{[:Basic "p4"]}] [:OR #{[:Basic "p5"]}]
+     [:OR #{[:Basic "p6"]}] [:OR #{[:Basic "p7"]}] [:OR #{[:Basic "p8"]}]
+     [:OR #{[:Basic "p9"]}] [:OR #{[:Basic "p10"]}] [:HyperEdge "t1"]
+     [:HyperEdge "t2"] [:HyperEdge "t3"] [:HyperEdge "t4"]
+     [:HyperEdge "t5"]}
+   {"t4" [#{"p4" "p5"} #{"p6" "p8"}],
+    "t5" [#{"p5" "p7"} #{"p9"}],
+    "t6" [#{"p8" "p9"} #{"p10"}],
+    "t1" [#{"p1"} #{"p2" "p3"}],
+    "t2" [#{"p2"} #{"p4" "p5"}],
+    "t3" [#{"p3" "p6"} #{"p5" "p7"}]}])
+
+(def test-case-10-result-spec
+  [false
+   {:HyperEdge 6, :AND 0, :Statechart 0, :OR 9, :Basic 9}
+   #{[:HyperEdge "t6"] [:OR #{[:Basic "p1"]}] [:OR #{[:Basic "p2"]}]
+     [:OR #{[:Basic "p3"]}] [:OR #{[:Basic "p4"]}] [:OR #{[:Basic "p5"]}]
+     [:OR #{[:Basic "p6"]}] [:OR #{[:Basic "p8"]}] [:OR #{[:Basic "p9"]}]
+     [:OR #{[:Basic "p10"]}] [:HyperEdge "t1"] [:HyperEdge "t2"]
+     [:HyperEdge "t3"] [:HyperEdge "t4"] [:HyperEdge "t5"]}
+   {"t4" [#{"p4" "p5"} #{"p8"}],
+    "t5" [#{"p5" "p6"} #{"p9"}],
+    "t6" [#{"p8" "p9"} #{"p10"}],
+    "t1" [#{"p1"} #{"p2" "p3"}],
+    "t2" [#{"p2"} #{"p4" "p5"}],
+    "t3" [#{"p3"} #{"p5" "p6"}]}])
+
+(def test-case-11-result-spec
+  [true
+   {:HyperEdge 5, :AND 2, :Statechart 1, :OR 3, :Basic 6}
+   #{[:AND
+      #{[:OR
+         #{[:HyperEdge "t7"]
+           [:AND
+            #{[:OR #{[:Basic "p2"] [:Basic "p3"] [:HyperEdge "t4"]}]
+              [:OR #{[:Basic "p4"] [:Basic "p6"] [:HyperEdge "t3"]}]}]
+           [:Basic "p1"] [:HyperEdge "t1"] [:Basic "p7"]
+           [:HyperEdge "t5"]}]}]}
+   {"t4" [#{"p2"} #{"p3"}],
+    "t5" [#{"p3" "p6"} #{"p7"}],
+    "t7" [#{"p7"} #{"p3" "p6"}],
+    "t1" [#{"p1"} #{"p2" "p4"}],
+    "t3" [#{"p4"} #{"p6"}]}])
 
 (def performance-test-cases
   {200    [false {:Basic 163,    :HyperEdge 126,    :OR 65,     :AND 6}]
