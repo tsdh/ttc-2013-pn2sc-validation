@@ -17,7 +17,7 @@
   [;; Does it resolve to a Statechart with unique top-AND-State?
    true
    ;; Expected element counts
-   {:HyperEdge 7, :AND 4, :Statechart 1, :OR 7, :Basic 11}
+   {:HyperEdge 7, :AND 4, :OR 7, :Basic 11}
    ;; Expected containment hierarchy
    #{[:AND
       #{[:OR
@@ -49,7 +49,7 @@
 
 (def test-case-2-result-spec
   [true
-   {:HyperEdge 10, :AND 3, :Statechart 1, :OR 5, :Basic 12}
+   {:HyperEdge 10, :AND 3, :OR 5, :Basic 12}
    #{[:AND
       #{[:OR
          #{[:Basic "E1"] [:Basic "E2"] [:HyperEdge "n53"]
@@ -82,7 +82,7 @@
 
 (def test-case-3-result-spec
   [false
-   {:HyperEdge 10, :AND 0, :Statechart 0, :OR 6, :Basic 10}
+   {:HyperEdge 10, :AND 0, :OR 6, :Basic 10}
    #{[:OR
       #{[:Basic "take pictures"]
         [:Basic "patient walking to dermatology"]
@@ -130,7 +130,7 @@
 
 (def test-case-4-result-spec
   [false
-   {:HyperEdge 8, :AND 1, :Statechart 0, :OR 5, :Basic 10}
+   {:HyperEdge 8, :AND 1, :OR 5, :Basic 10}
    #{[:OR
       #{[:AND
          #{[:OR #{[:Basic "p2"] [:Basic "p5"] [:HyperEdge "t5"]}]
@@ -152,7 +152,7 @@
 
 (def test-case-5-result-spec
   [false
-   {:HyperEdge 3, :AND 0, :Statechart 0, :OR 2, :Basic 4}
+   {:HyperEdge 3, :AND 0, :OR 2, :Basic 4}
    #{[:OR #{[:Basic "p1"] [:Basic "p3"] [:HyperEdge "t2"]}]
      [:OR #{[:Basic "p2"] [:Basic "p4"] [:HyperEdge "t3"]}]
      [:HyperEdge "t1"]}
@@ -162,7 +162,7 @@
 
 (def test-case-6-result-spec
   [false
-   {:HyperEdge 2, :AND 1, :Statechart 0, :OR 4, :Basic 4}
+   {:HyperEdge 2, :AND 1, :OR 4, :Basic 4}
    #{[:OR #{[:Basic "p4"]}] [:HyperEdge "t1"]
      [:OR
       #{[:AND #{[:OR #{[:Basic "p2"]}] [:OR #{[:Basic "p3"]}]}]
@@ -172,7 +172,7 @@
 
 (def test-case-7-result-spec
   [true
-   {:HyperEdge 7, :AND 3, :Statechart 1, :OR 5, :Basic 10}
+   {:HyperEdge 7, :AND 3, :OR 5, :Basic 10}
    #{[:AND
       #{[:OR
          #{[:HyperEdge "t7"] [:Basic "p10"] [:Basic "p1"]
@@ -198,7 +198,7 @@
 
 (def test-case-8-result-spec
   [true
-   {:HyperEdge 8, :AND 4, :Statechart 1, :OR 7, :Basic 12}
+   {:HyperEdge 8, :AND 4, :OR 7, :Basic 12}
    #{[:AND
       #{[:OR
          #{[:Basic "p12"]
@@ -229,7 +229,7 @@
 
 (def test-case-9-result-spec
   [false
-   {:HyperEdge 6, :AND 0, :Statechart 0, :OR 10, :Basic 10}
+   {:HyperEdge 6, :AND 0, :OR 10, :Basic 10}
    #{[:HyperEdge "t6"] [:OR #{[:Basic "p1"]}] [:OR #{[:Basic "p2"]}]
      [:OR #{[:Basic "p3"]}] [:OR #{[:Basic "p4"]}] [:OR #{[:Basic "p5"]}]
      [:OR #{[:Basic "p6"]}] [:OR #{[:Basic "p7"]}] [:OR #{[:Basic "p8"]}]
@@ -245,7 +245,7 @@
 
 (def test-case-10-result-spec
   [false
-   {:HyperEdge 6, :AND 0, :Statechart 0, :OR 9, :Basic 9}
+   {:HyperEdge 6, :AND 0, :OR 9, :Basic 9}
    #{[:HyperEdge "t6"] [:OR #{[:Basic "p1"]}] [:OR #{[:Basic "p2"]}]
      [:OR #{[:Basic "p3"]}] [:OR #{[:Basic "p4"]}] [:OR #{[:Basic "p5"]}]
      [:OR #{[:Basic "p6"]}] [:OR #{[:Basic "p8"]}] [:OR #{[:Basic "p9"]}]
@@ -260,7 +260,7 @@
 
 (def test-case-11-result-spec
   [true
-   {:HyperEdge 5, :AND 2, :Statechart 1, :OR 3, :Basic 6}
+   {:HyperEdge 5, :AND 2, :OR 3, :Basic 6}
    #{[:AND
       #{[:OR
          #{[:HyperEdge "t7"]
@@ -310,6 +310,9 @@
   (remove #(econtainer %) (eallobjects sc)))
 
 (defn validate-counts [sc counts]
+  (is (<= (count (eallobjects sc 'Statechart)) 1)
+      (format "ERROR: There should be at most one Statechart, but there are %s."
+              (count (eallobjects sc 'Statechart)) 1))
   (doseq [[tkw num] counts
           :let [t (symbol (name tkw))
                 c (count (eallobjects sc t))]]
