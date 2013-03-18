@@ -296,12 +296,12 @@
 
 (declare make-content-spec)
 (defn spec-for [o]
-  (type-cond o
+  (type-case o
     'Statechart (first (make-content-spec (econtents o) #{}))
-    'Basic     [:Basic (eget o :name)]
-    'HyperEdge [:HyperEdge (eget o :name)]
-    'OR        [:OR (make-content-spec (econtents o) #{})]
-    'AND       [:AND (make-content-spec (econtents o) #{})]))
+    'Basic      [:Basic (eget o :name)]
+    'HyperEdge  [:HyperEdge (eget o :name)]
+    'OR         [:OR (make-content-spec (econtents o) #{})]
+    'AND        [:AND (make-content-spec (econtents o) #{})]))
 
 (defn make-content-spec [tops v]
   (into v (map spec-for tops)))
