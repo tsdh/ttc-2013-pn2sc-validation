@@ -287,10 +287,10 @@
    5000   [true {:Basic 4047,   :HyperEdge 3146,   :OR 1551,   :AND 201}]
    10000  [true {:Basic 8092,   :HyperEdge 6291,   :OR 3101,   :AND 401}]
    20000  [true {:Basic 16183,  :HyperEdge 12582,  :OR 6201,   :AND 801}]
-   40000  [true {:Basic 32365,  :HyperEdge 25164,  :OR 17392,  :AND 1200}]
-   80000  [true {:Basic 64729,  :HyperEdge 50328,  :OR 44765,  :AND 1600}]
-   100000 [true {:Basic 80911,  :HyperEdge 62910,  :OR 50965,  :AND 2400}]
-   200000 [true {:Basic 161821, :HyperEdge 125820, :OR 121892, :AND 3199}]})
+   40000  [false {:Basic 32365,  :HyperEdge 25164,  :OR 17392,  :AND 1200}]
+   80000  [false {:Basic 64729,  :HyperEdge 50328,  :OR 44765,  :AND 1600}]
+   100000 [false {:Basic 80911,  :HyperEdge 62910,  :OR 50965,  :AND 2400}]
+   200000 [false {:Basic 161821, :HyperEdge 125820, :OR 121892, :AND 3199}]})
 
 ;;* The validation code
 
